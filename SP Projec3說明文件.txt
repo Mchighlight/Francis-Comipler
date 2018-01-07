@@ -1,0 +1,135 @@
+系統程式第三次Project SP_Project3 Francis Compiler
+
+開發人員	:黃鴻志 10427137 資訊三甲
+完成日期    : 107/1/7
+開發環境	: Windown10 Home
+Model		: ASUS GL502VT
+程式語言	: JAVA
+開發工具	: Eclipse Java EE IDE for Web Developers.
+			  Version: Neon.3 Release (4.6.3)
+Compiler	: Francis
+
+使用方法:
+1.	開啟Eclipse JAVA NEON 2 或 3
+2.  FileImportExisting Projects into Workspace
+3.  在使用者介面輸入”正確”檔案名E.X e1, input1, input2, input3, ..............input7 
+4.  檔案會輸出一個檔名叫做outputFrancis.txt(裡面包含中間碼及錯誤訊息)
+(PS:如果要看其他檔案的Francis中間碼，請重新RUN程式)
+
+Class介紹 :
+Main 		        :包含程式運作區、使用者介面、TABLE1到4
+myFile 		        :程式切token區、程式輸出及輸入區、原始File與Lexical File放置區
+HashFunction 	    :包含兩個主要函示1.TABLE1到TABLE4 HASHTABLE 2.TABLE3到TABLE4 HASHTABLE
+LineInfo		    :一行的每個Token資料，toString輸出整行的Token資訊
+TokenInfo		    :每個Token的名字、table及entry，toString輸出每個Token的資訊
+/*****************************Lexical Analysis所使用的Class***************************************/
+Quadruple			:1.存放中間碼及那一行的程式內容，並且能輸出那一行的中間碼及程式內容
+                     2.進行Forward Reference，可以對CALL,LABEL,GO TO,IF做FORWARD REFERENCE
+
+francis 			:1.對12個STATEMENT做翻中間碼
+					 2.做錯誤判斷
+					 3.考慮程式換行問題
+                     4.程式輸出Francis中間碼
+/*****************************Francis Complier所使用的Class***************************************/
+					 
+					 
+Function介紹 :
+ReadTable			:讀入TABLE1到4
+readFile			:讀入txt檔放入ArrayList
+deleteWhiteSpace 	:在有標點符號處前後加上空白
+findNumber	    	:將Integer及Real取下做成Table 3 及 Table4
+findSymbol	    	:將Symbol取下做成Table5
+toLexical			:將原始檔做Lexical Analysis
+toLexical_output	:輸出Lexical Analysis結果
+/**************************Lexical Analysis所使用的Function*****************************************/
+dealForward			:處理Forward Reference問題(CALL,LABEL,GO TO, IF做FORWARD)
+showQuadruple		:輸出那一行程式的中間碼及程式內容
+/************************************Quadruple Class內的函式****************************************/
+makeTable5			:建立Identifier Table(Table5)
+toStatement			:處理程式換行問題
+makeStatement		:1.進行每一行翻12個STATEMENT成中間碼的問題			2.錯誤檢定
+makeQuadruple		:會使用makeStatement來進行整個程式翻中間碼的動作	2.做Forward Reference
+whichType			:決定Statement的Datatype，例如:ARRAY, BOOLEAN, CHAR,..........等等六個DATATYPE
+toQuadruple_output	:輸出中間碼及錯誤訊息		
+/*************************************主要francis Class內的函式*****************************************/
+makeProgram			:處理 Program Statement
+makeVariable		:處理 Variable, Dimension, Subroutine Statement
+makeLabel			:處理 Lable Statement
+makeGto				:處理 Go To Statement
+makeSubroutine		:處理 Subroutine Statement
+makeCall			:處理 Call 
+ReversePolish		:處理 Assignment Statement 左到右，符號大到小的運算，主要是使用雙STACK
+makeAssignment		:處理 Assignment Statement
+ReversePolish_If	:處理 If Statement 左到右，符號的運算，主要是使用雙STACK	
+makeIf				:處理 If Statement
+makeEndMainSubroutine:處理 ENP, ENDS Statement
+/***************************************主要Statement處理的函式*************************************************/ 
+isMultiVar			:將Variable Identifier加入Table5內，並處理Subroutine的位置及Variable PARSER是否正確
+makeArray			:將Array Identifier加入Table5內及其陣列內內容加入Table7
+isMulArray			:處理Array的PARSER是否正確及Subroutine的位置
+isCall				:將Call Statement內內容加到Table 7
+skip				:如果TABLE5裡的Identifier重複就跳到Hash的下一個位置
+/****************************************次要函式*****************************************************************/
+
+
+
+
+功能說明:
+1.可進行Lexical Analysis
+2.可考慮不斷換行讀到分號問題
+3.可以翻中間碼
+4.可進行中間碼Error檢查
+
+資料結構說明:
+LineInfo		    :一行的每個Token資料，toString輸出整行的Token資訊,式TokenInfo的ArrayList
+TokenInfo		    :每個Token的名字、table及entry，toString輸出每個Token的資訊
+1.Table1到Table4	:使用Hash做成，並將其存成ArrayList
+2.Table5			:使用Hash做成，每個Token內有包含Subroutine, Pointer, Table, Entry及是否要處理Forward Reference，並將其存成ArrayList
+3.Table6(中間碼)	:使用Quadruple Class做成，裡面包含中間碼， 程式內容，及印出函式，並將其存成Quadruple ArrayList
+4.Table7(Pointer)	:按照加入順序，做成 Pointer ArrayList
+5.加減乘除資料結構	:主要是利用雙Stack來進行運算，最將結果(中間碼)加入Quadruple ArrayList
+
+流程說明:
+1.	讀入TABLE1到4建立HASHTABLE
+2.	將原始檔讀入有符號處前後加上空白(之後會用內建Function將String轉為ArrayList)
+3.	個別找出Integer、及Real建成TABLE3和TABLE4
+4.	將空白處切成一個個Token，沒有對應到TABLE的字串即為SYMBOL
+5.	加上每個Token對應的Table及Entry
+7.	輸出Lexical File
+/***************************Lexical Analysis所使用的步驟*********************************************/
+1.	使用toStatement處理換行問題
+2.	利用MakeQuadruple對整個程式做中間碼翻譯
+2-1	在翻前要先檢查是否有包含Label的Forward Rereference
+3.	利用MakeStatement做一行Statement翻中間碼動作
+3-1 INPUT, OUTPUT並沒有這兩個Statement功能
+3-2 Assigment Statement則需呼叫ReversePolish來做加減乘除運算
+3-3 If Statement則需呼要ReversePolish_If來做Condition Statement的運算
+3-3-1 If Statement需要在makeIf內處理完Forward Reference 的動作
+3-4	Call, Label,Go to需要記下其要做Forward Reference的位置
+3-5	程式第一輪結束後，進行Forward Reference處理Call,及Go To(主要是利用Quadruple Class內的 dealForward函式來進行處理)
+4	輸出Francis Complier中間碼並加上錯誤訊息
+/*****************************Francis Compiler主要處理步驟*********************************************/
+
+
+
+
+程式未完成部分 :
+1.If的THEN ELSE裡面如果ASSIGNEMENT過多會導致，Random Number的數值不正確。
+2.Assignment裡面如是陣列要是以行或以列為主找出數字位置，我只做到二維陣列EX:B(X,Y)我可以轉換成功但，只要是B(I,J,K)我就會有顯示我沒辦法做到，因為我不知道二維以上要怎麼轉換。
+3.宣告Boolean及Char這兩個功能，我沒有做是因為範例程式沒有給我們這兩個的例子。
+4.LABEL所放的位置是要要把LABEL印出來，這我只考慮到有可能的情況，因為範例程式只給某些STATEMENT，並沒有所有的範例。
+5.INPUT OUTPUT這兩個STATEMENT我沒有做這兩個STATEMENT的功能，因為課本及範例程式皆沒給。
+6.SUBROUTINE及PROGRAM的結束位置我沒有判斷，但我想翻中間碼應該是不用考慮到此部分。
+7.錯誤訊息方面我沒辦法正確的指出哪一行發生錯誤，因為程式是讀到"分號"才結束，所以在這之前我會全部把分號之前的東西歸為一行。
+8.錯誤訊息與老師的範例程式不同，老師遇到錯誤就會停止，但我會不斷的做到程式結束為止
+
+
+寫Compiler的心得 :
+
+1.首先我先把老師的投影片看完，並且決定要使用Parse Int tree方法來寫我的Complier，我把每個Statement都先想好，並且先寫下要寫的步驟及會遇到的狀況還有PsuedoCode，其中光是想要怎麼寫Assignment及If就花了一整天的時間，最後終於搞懂Operation及Operator的Stack該如何使用
+2.再來我先改寫第一次Project的Lexical分析，把一些不必要的部分刪掉，再加上REAL TABLE
+3.我先要考慮換行的問題，解決後慢慢的一個一個按照寫好的Psuedo Code去做，當然最後寫的東西宇Psuedo Code差很多，因為過程遇到太多額外狀況(像是Subroutine等等)，花了約四天打好除了ASSIGNMENT及IF以外的STATEMENT，因為光花在想這兩個STATEMENT的時間就花了五天，最後我再考慮Forward Reference的情況，例如CALL GTO LABEL等STATEMENT(IF的Forward Rerefernce我再第一次程式執行就考慮)，最後再加上錯誤判斷(Error)。
+4.加上註解，並進行多輪的Debug及測試，這過程大概花了三天，最後我發現自己的程式還有很多要改進的地方，很多地方要考慮，但基本上老師給的及課本上的測試數據都能正確執行，自己也改一些測試數據來測試。我想如果要真正完整的的寫出一個francis complier，至少要有上百個測試數據，實在是有太多狀況要考慮，如果能從寫一遍Complier，我會選擇種樹的方法來寫Compiler，這樣程式碼會看許多
+
+
+

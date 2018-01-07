@@ -1,0 +1,10 @@
+PROGRAM MAIN ;
+VARIABLE INTEGER:U, V,
+M   ;
+U = 5 ;
+V = 7 ;
+CALL S1(U ,V , M ) ;
+ENP;
+SUBPOUTINE S1(INTEGER :X, Y, M ) ;
+M = X + Y + 2.7 ;
+ENS;
